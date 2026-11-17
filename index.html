@@ -291,12 +291,13 @@ details.box summary { cursor: pointer; padding: 13px 0; font-family: var(--font-
 .boxbody.terms { font-size: 13.5px; }
 .boxbody.terms h3 { font-size: 14px; }
 .foot a, .boxbody a { color: var(--accent); }
-.tables { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tables { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.tables > * { min-width: 0; }
 table.rates { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
 table.rates caption { text-align: left; font-weight: 700; font-size: 13.5px; padding-bottom: 4px; }
 table.rates th, table.rates td { border: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
 table.rates th { background: var(--panel2); font-size: 12.5px; }
-table.rates td:first-child { font-family: var(--font-num); white-space: nowrap; }
+table.rates td:first-child { font-family: var(--font-num); white-space: nowrap; width: 1%; }
 table.rates tr.hit td { background: var(--do-bg); font-weight: 700; }
 .sources { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 8px; }
 .sources h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 16.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); }
@@ -306,7 +307,7 @@ table.rates tr.hit td { background: var(--do-bg); font-weight: 700; }
 .sources a { color: var(--accent); }
 .note { font-size: 12.5px; color: var(--muted); margin: 0; }
 .foot { font-size: 12.5px; color: var(--muted); }
-@media (max-width: 420px) { .tables { grid-template-columns: 1fr; } .opt { grid-template-columns: 96px 1fr; } }
+@media (max-width: 420px) { .opt { grid-template-columns: 96px 1fr; } }
 
 @media (min-width: 900px) {
   .wrap { max-width: 1280px; --gut: max(20px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)); padding-left: var(--gut); padding-right: var(--gut); }
@@ -576,7 +577,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
         <li>Sodium Phosphates Injection, USP [prescribing information]. Hospira (Pfizer).<span class="use">3 mmol phosphorus and 4 mEq sodium per mL; IV phosphate can lower serum calcium</span></li>
       </ol>
     </section>
-    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.11. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
+    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.12. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
   </div>
   </div>
 </div>
@@ -1446,7 +1447,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (!("serviceWorker" in navigator)) { say("Offline use isn't available in this browser."); return; }
     say("Saving for offline use…");
     navigator.serviceWorker.register("sw.js").then(function () { return navigator.serviceWorker.ready; })
-      .then(function () { return caches.has("lyte-check-2026-11-17.11"); })
+      .then(function () { return caches.has("lyte-check-2026-11-17.12"); })
       .then(function (ok) { say(ok ? "Ready offline ✓" : "Saving for offline use… reopen the app in a few seconds."); })
       .catch(function () { say("Couldn't save for offline use. Open the app once more while online."); });
   })();
