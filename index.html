@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Lyte Check">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#003D79">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
@@ -138,6 +138,8 @@ button.chip:focus-visible { outline: 3px solid var(--orange); outline-offset: 2p
 .field input::placeholder { color: var(--muted); opacity: .7; font-weight: 500; font-size: 15px; }
 .field input:focus { outline: 3px solid var(--orange); outline-offset: 0; border-color: var(--orange); }
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.field input[type="date"] { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; overflow: hidden; font-size: 15.5px; padding: 8px 6px; text-align: left; }
+.field input[type="date"]::-webkit-date-and-time-value { text-align: left; }
 input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .inline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; }
 .inline label { font-size: 12.5px; color: var(--muted); font-weight: 700; }
@@ -307,6 +309,8 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
 .sheet table.lab { width: 100%; border-collapse: collapse; margin-top: 5pt; table-layout: fixed; }
 .sheet table.lab th { border: 1.2pt solid #000; font-size: 8.5pt; padding: 2pt 4pt; text-align: left; }
 .sheet table.lab td { border: 1pt solid #000; height: 0.34in; padding: 2pt 4pt; font: 600 11pt "IBM Plex Mono", monospace; }
+.sheet table.lab th:first-child { width: 1.15in; }
+.sheet table.lab td:first-child { white-space: nowrap; font-size: 10pt; }
 .sheet .blk { border: 1.4pt solid #000; padding: 5pt 7pt 7pt; margin-top: 8pt; }
 .sheet .notes { border: 1.4pt solid #000; margin-top: 8pt; padding: 4pt 7pt; }
 .sheet .notes div { border-bottom: 0.8pt solid #000; height: 0.34in; }
@@ -367,7 +371,8 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     <section class="panel" aria-labelledby="h-lab">
       <h2 id="h-lab">Enter labs <small>blank boxes are skipped</small></h2>
       <div class="fields">
-        <div class="field"><label for="lt">Drawn at <span class="u">24-hr, e.g. 0400</span></label><input id="lt" type="text" inputmode="numeric" maxlength="4" placeholder="now" autocomplete="off"></div>
+        <div class="field"><label for="ld">Date drawn <span class="u">today unless changed</span></label><input id="ld" type="date" autocomplete="off"></div>
+        <div class="field"><label for="lt">Time drawn <span class="u">24-hr, e.g. 0400</span></label><input id="lt" type="text" inputmode="numeric" maxlength="4" placeholder="now" autocomplete="off"></div>
         <div class="field"><label for="k">K <span class="u">mEq/L</span></label><input id="k" type="number" inputmode="decimal" step="0.1"></div>
         <div class="field"><label for="mg">Mg <span class="u">mg/dL</span></label><input id="mg" type="number" inputmode="decimal" step="0.1"></div>
         <div class="field"><label for="phos">Phos <span class="u">mg/dL</span></label><input id="phos" type="number" inputmode="decimal" step="0.1"></div>
@@ -497,7 +502,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
         <li>Sodium Phosphates Injection, USP [prescribing information]. Hospira (Pfizer).<span class="use">3 mmol phosphorus and 4 mEq sodium per mL; IV phosphate can lower serum calcium</span></li>
       </ol>
     </section>
-    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.4. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
+    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.6. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
   </div>
   </div>
 </div>
@@ -671,6 +676,20 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     return diff === -1 ? " yesterday" : diff === 1 ? " tomorrow" : diff < -1 ? " (" + (-diff) + " days ago)" : diff > 1 ? " (in " + diff + " days)" : "";
   }
   function inMin(ts) { var m = Math.round((ts - Date.now()) / MIN), a = Math.abs(m), t = a >= 90 ? Math.floor(a / 60) + " h " + (a % 60) + " min" : a + " min"; return m < 0 ? t + " late" : "in " + t; }
+  function ymd(ts) { var d = new Date(ts); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function mdy(ts) { var d = new Date(ts); return String(d.getMonth() + 1).padStart(2, "0") + "/" + String(d.getDate()).padStart(2, "0") + "/" + d.getFullYear(); }
+  function mdhm(ts) { var d = new Date(ts); return String(d.getMonth() + 1).padStart(2, "0") + "/" + String(d.getDate()).padStart(2, "0") + " " + hhmm(ts); }
+  var ldTouched = false;
+  function setToday() { if (!ldTouched) $("ld").value = ymd(Date.now()); }
+  function labTs() {   // date field + time field; blank time = now (on that date)
+    var dv = /^(\d{4})-(\d{2})-(\d{2})$/.exec($("ld").value || ""), tv = String($("lt").value || "").replace(/\D/g, "");
+    if (tv.length === 3) tv = "0" + tv;
+    var hasT = tv.length === 4 && +tv.slice(0, 2) < 24 && +tv.slice(2) < 60;
+    if (!dv) { var t0 = hasT ? parseHHMM(tv, Date.now()) : null; return t0 === null ? Date.now() : t0; }
+    var d = new Date(+dv[1], +dv[2] - 1, +dv[3]), n = new Date();
+    if (hasT) d.setHours(+tv.slice(0, 2), +tv.slice(2), 0, 0); else d.setHours(n.getHours(), n.getMinutes(), 0, 0);
+    return d.getTime();
+  }
   function whenShort(ts) { var d = new Date(ts), t = new Date(); return d.toDateString() === t.toDateString() ? hhmm(ts) : String(d.getMonth() + 1).padStart(2, "0") + "/" + String(d.getDate()).padStart(2, "0") + " " + hhmm(ts); }
   function card(level, name, val, msg) {
     return '<div class="chk ' + level + '"><span class="name">' + esc(name) + ' <span class="pill ' + level + '">' + LABEL[level] + '</span></span>' +
@@ -968,7 +987,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var rows = state.labs.map(function (r) {
       var f = function (v) { return v == null ? "" : r1s(v); }, c = corrOf(r.ca, r.alb);
       var lo = function (key, v) { return v == null ? "" : (key === "k" && v <= 4.0) || (key === "mg" && v <= 1.8) || (key === "phos" && v <= 2.5) ? " lo" : ""; };
-      return '<tr><td class="n">' + esc(whenShort(r.ts)) + '</td><td class="n' + lo("k", r.k) + '">' + f(r.k) + '</td><td class="n' + lo("mg", r.mg) + '">' + f(r.mg) + '</td><td class="n' + lo("phos", r.phos) + '">' + f(r.phos) +
+      return '<tr><td class="n">' + esc(mdhm(r.ts)) + '</td><td class="n' + lo("k", r.k) + '">' + f(r.k) + '</td><td class="n' + lo("mg", r.mg) + '">' + f(r.mg) + '</td><td class="n' + lo("phos", r.phos) + '">' + f(r.phos) +
         '</td><td class="n">' + f(r.ca) + '</td><td class="n">' + f(r.alb) + '</td><td class="n' + (c !== null && c <= 8.5 ? " lo" : "") + '">' + (c === null ? "" : f1(c)) + '</td><td class="n' + (r.ica != null && r.ica <= 1.12 ? " lo" : "") + '">' + (r.ica == null ? "" : r.ica) + "</td></tr>";
     });
     tb.innerHTML = rows.length ? rows.join("") : '<tr><td class="empty" colspan="8">No labs logged yet. Red = in a replacement row.</td></tr>';
@@ -976,7 +995,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   }
   function r1s(v) { return String(rd(v, 2)); }
   function logLabs() {
-    var ts = parseHHMM($("lt").value, Date.now()); if (ts === null) ts = Date.now();
+    var ts = labTs();
     var row = { ts: ts }, any = false;
     LABKEYS.forEach(function (k) { var v = num(k); row[k] = v; if (v !== null) any = true; });
     if (!any) { $("k").focus(); return; }
@@ -985,12 +1004,12 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var map = { k: ["k"], mg: ["mg"], phos: ["phos"], ca: ["ca", "alb", "ica"] };
     LY.forEach(function (ly) { if (map[ly].some(function (k) { return row[k] !== null; })) { state.give[ly] = BLANK(); } });
     saveGive();
-    IDS.forEach(function (k) { $(k).value = ""; });
+    IDS.forEach(function (k) { $(k).value = ""; }); ldTouched = false; setToday();
     $("exampleNote").hidden = true; compute();
   }
   function undoLabs() {
     var r = state.labs.shift(); if (!r) return; store("lyte-labs", state.labs);
-    LABKEYS.forEach(function (k) { $(k).value = r[k] != null ? r[k] : ""; }); $("lt").value = hhmm(r.ts); compute();
+    LABKEYS.forEach(function (k) { $(k).value = r[k] != null ? r[k] : ""; }); $("lt").value = hhmm(r.ts); $("ld").value = ymd(r.ts); ldTouched = true; compute();
   }
 
   // ---- Print: 1 tracking page + 1 protocol page, black and white
@@ -999,10 +1018,10 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var circ = function (opts, on) { return '<span class="circ">' + opts.map(function (x) { return x[0] === on ? "<b>" + esc(x[1]) + "</b>" : esc(x[1]); }).join(" · ") + "</span>"; };
     var lab = state.labs[0] || {}, val = function (k) { var c = cur(k); return c ? c.v : ""; };
     var corr = I.ca.corr;
-    var head = '<div class="phd"><h1>Lyte Check · Electrolyte replacement</h1><div class="wr">Date ' + wi("") + " &nbsp; Room " + wi("", "s") + "</div></div>" +
+    var head = '<div class="phd"><h1>Lyte Check · Electrolyte replacement</h1><div class="wr">Date ' + wi(lab.ts ? mdy(lab.ts) : mdy(labTs())) + " &nbsp; Room " + wi("", "s") + "</div></div>" +
       '<div class="line"><span>Order active in Expanse: Y · N</span><span>Route: ' + circ([["po", "PO"], ["piv", "Peripheral (PIV, midline)"], ["cvc", "Central (CVC, PICC, port)"]], state.route) + '</span><span>Order limits checked (renal, UO): Y · N</span><span>Can take PO: Y · N</span></div>' +
       '<table class="lab"><thead><tr><th>Drawn</th><th>K</th><th>Mg</th><th>Phos</th><th>Ca</th><th>Albumin</th><th>Corrected Ca</th><th>Ionized Ca</th></tr></thead><tbody><tr><td>' +
-        (lab.ts ? hhmm(lab.ts) : "") + "</td><td>" + val("k") + "</td><td>" + val("mg") + "</td><td>" + val("phos") + "</td><td>" + val("ca") + "</td><td>" + val("alb") + "</td><td>" + (corr === null ? "" : f1(corr)) + "</td><td>" + val("ica") + "</td></tr></tbody></table>";
+        (lab.ts ? mdhm(lab.ts) : "") + "</td><td>" + val("k") + "</td><td>" + val("mg") + "</td><td>" + val("phos") + "</td><td>" + val("ca") + "</td><td>" + val("alb") + "</td><td>" + (corr === null ? "" : f1(corr)) + "</td><td>" + val("ica") + "</td></tr></tbody></table>";
     var MAXD = { k: 8, mg: 6, phos: 4, ca: 4 };
     var blocks = LY.map(function (ly) {
       var o = I[ly], g = state.give[ly], R = run(ly) || {};
@@ -1110,10 +1129,12 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   $("logLabBtn").addEventListener("click", logLabs);
   $("undoLabBtn").addEventListener("click", undoLabs);
   IDS.forEach(function (id) { $(id).addEventListener("input", function () { $("exampleNote").hidden = true; compute(); }); });
+  $("ld").addEventListener("input", function () { ldTouched = $("ld").value !== ymd(Date.now()); if (!$("ld").value) { ldTouched = false; setToday(); } });
   $("clearBtn").addEventListener("click", function () {
     IDS.forEach(function (id) { $(id).value = ""; });
     state.labs = []; store("lyte-labs", []); LY.forEach(function (l) { state.give[l] = BLANK(); }); saveGive(); state.route = ""; store("lyte-route", ""); state.chk = []; store("lyte-chk", []);
     try { localStorage.removeItem("lyte-fields"); } catch (e) {}
+    ldTouched = false; setToday();
     $("exampleNote").hidden = true; compute(); showTab("labs"); $("k").focus();
   });
 
@@ -1160,10 +1181,11 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   window.addEventListener("afterprint", fitPreview);
   window.addEventListener("resize", fitPreview);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.classList.contains("previewing")) document.body.classList.remove("previewing"); });
-  setInterval(function () { if (!document.hidden && !document.activeElement.matches("input")) compute(); }, 30000);
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) compute(); });
+  setInterval(function () { if (!document.hidden && !document.activeElement.matches("input")) { setToday(); compute(); } }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { setToday(); compute(); } });
 
   // ---- Start
+  setToday();
   setTheme(load("lyte-theme", "light") === "dark" ? "dark" : "light");
   setFont(load("lyte-font", "classic"));
   setSize(load("lyte-size", 1));
@@ -1188,7 +1210,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (!("serviceWorker" in navigator)) { say("Offline use isn't available in this browser."); return; }
     say("Saving for offline use…");
     navigator.serviceWorker.register("sw.js").then(function () { return navigator.serviceWorker.ready; })
-      .then(function () { return caches.has("lyte-check-2026-11-17.4"); })
+      .then(function () { return caches.has("lyte-check-2026-11-17.6"); })
       .then(function (ok) { say(ok ? "Ready offline ✓" : "Saving for offline use… reopen the app in a few seconds."); })
       .catch(function () { say("Couldn't save for offline use. Open the app once more while online."); });
   })();
