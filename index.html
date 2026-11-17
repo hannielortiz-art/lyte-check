@@ -180,6 +180,8 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 .lyhead h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 17px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); }
 .lyhead .v { font: 600 22px var(--font-num); }
 .lyhead .v small { font: 400 12.5px var(--font-body); color: var(--muted); }
+.nrm { margin: -4px 0 0; font-size: 13px; color: var(--muted); }
+.nrm b { color: var(--ink); }
 /* Route choices: each is a button showing that route's dose */
 .opts { display: grid; gap: 6px; }
 .opt { display: grid; grid-template-columns: 112px 1fr; align-items: center; gap: 2px 10px; text-align: left; width: 100%; background: var(--field); color: var(--ink);
@@ -232,6 +234,7 @@ table.log th { background: var(--panel2); font-size: 11.5px; font-weight: 700; t
 table.log td { border-top: 1px solid var(--line); padding: 6px 8px; vertical-align: top; }
 table.log td.n { font-family: var(--font-num); font-weight: 600; white-space: nowrap; }
 table.log td.lo { color: var(--tell); }
+table.log .fl { font: 700 11px var(--font-body); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 0 3px; }
 table.log td.empty { color: var(--muted); font-family: var(--font-body); }
 table.log td.ed { padding: 3px 4px 3px 6px; width: 1%; }
 table.log tr.editing td { background: var(--watch-bg); }
@@ -239,6 +242,44 @@ table.log tr.editing td { background: var(--watch-bg); }
 .editbtn:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 .editbar { margin: 0; font-size: 14px; background: var(--watch-bg); border-left: 4px solid var(--watch); border-radius: 8px; padding: 7px 10px; }
 .btn.del { color: var(--tell); border-color: var(--tell); }
+/* Trend charts: one small chart per electrolyte, each on its own scale */
+.charts { gap: 14px; }
+.ch { display: grid; gap: 4px; }
+.ch + .ch { border-top: 1px solid var(--line); padding-top: 12px; }
+.ch .hd { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.ch .hd b { font-family: var(--font-display); font-size: 15px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); }
+.ch .hd span { font: 600 15px var(--font-num); }
+.ch .hd small { font: 400 12.5px var(--font-body); color: var(--muted); }
+.ch svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ch .grid { stroke: var(--line); stroke-width: 1; }
+.ch .ax { fill: var(--muted); font: 400 19px var(--font-body); }
+.ch .axn { fill: var(--muted); font: 500 19px var(--font-num); }
+.ch .zone { fill: var(--watch-bg); }
+.ch .zone2 { fill: var(--watch-bg); opacity: .6; }
+.ch .hz line { stroke: var(--watch); stroke-width: 2; opacity: .55; }
+.ch .zone2h { pointer-events: none; }
+.ch .z2l { stroke: var(--watch); stroke-width: 1.5; stroke-dasharray: 3 4; pointer-events: none; }
+.ch .zl { fill: var(--watch); font: 700 18px var(--font-body); }
+.ch .call { stroke: var(--tell); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.ch .cl { fill: var(--tell); font: 700 18px var(--font-body); }
+.ch .ln { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ch .pt { fill: var(--accent); stroke: var(--panel); stroke-width: 2; pointer-events: none; }
+.ch svg text, .ch .ln, .ch .zone, .ch .zone2, .ch .grid, .ch .call { pointer-events: none; }
+.ch .pt.sel { fill: var(--orange); }
+.ch .hit { fill: transparent; cursor: pointer; }
+.ch .hit:focus { outline: none; }
+.ch .hit:focus-visible + .pt { stroke: var(--orange); stroke-width: 4; }
+.ch .vl { fill: var(--ink); font: 600 20px var(--font-num); }
+.ch .key { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 12.5px; color: var(--muted); }
+.ch .key span { display: inline-flex; align-items: center; gap: 6px; }
+.ch .sw { display: inline-block; width: 16px; height: 11px; border-radius: 2px; }
+.ch .sw.z { background: var(--watch-bg); border: 1px solid var(--watch); }
+.ch .sw.z2 { background: repeating-linear-gradient(45deg, var(--watch) 0 1.5px, transparent 1.5px 5px); opacity: .7; border: 1px dashed var(--watch); }
+.ch .nl { stroke: var(--ok); stroke-width: 2; pointer-events: none; }
+.ch .sw.n { height: 0; border-radius: 0; border-top: 2px solid var(--ok); }
+.ch .sw.c { height: 0; border-radius: 0; border-top: 2px dashed var(--tell); }
+.ch .cap { margin: 0; font-size: 13px; color: var(--muted); min-height: 1.3em; }
+.ch .cap b { color: var(--ink); font-family: var(--font-num); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 details.box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 14px; min-width: 0; }
@@ -314,7 +355,8 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
 .sheet .line { display: flex; flex-wrap: wrap; gap: 3pt 14pt; margin-top: 5pt; font-size: 10pt; align-items: baseline; }
 .sheet .circ b { border: 1.2pt solid #000; border-radius: 9pt; padding: 0 4pt; }
 .sheet table.lab { width: 100%; border-collapse: collapse; margin-top: 5pt; table-layout: fixed; }
-.sheet table.lab th { border: 1.2pt solid #000; font-size: 8.5pt; padding: 2pt 4pt; text-align: left; }
+.sheet table.lab th { border: 1.2pt solid #000; font-size: 8.5pt; padding: 2pt 4pt; text-align: left; line-height: 1.15; }
+.sheet table.lab th small { font-weight: 400; font-size: 7.5pt; }
 .sheet table.lab td { border: 1pt solid #000; height: 0.34in; padding: 2pt 4pt; font: 600 11pt "IBM Plex Mono", monospace; }
 .sheet table.lab th:first-child { width: 1.15in; }
 .sheet table.lab td:first-child { white-space: nowrap; font-size: 10pt; }
@@ -380,12 +422,12 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
       <div class="fields">
         <div class="field"><label for="ld">Date drawn <span class="u">today unless changed</span></label><input id="ld" type="date" autocomplete="off"></div>
         <div class="field"><label for="lt">Time drawn <span class="u">24-hr, e.g. 0400</span></label><input id="lt" type="text" inputmode="numeric" maxlength="4" placeholder="now" autocomplete="off"></div>
-        <div class="field"><label for="k">K <span class="u">mEq/L</span></label><input id="k" type="number" inputmode="decimal" step="0.1"></div>
-        <div class="field"><label for="mg">Mg <span class="u">mg/dL</span></label><input id="mg" type="number" inputmode="decimal" step="0.1"></div>
-        <div class="field"><label for="phos">Phos <span class="u">mg/dL</span></label><input id="phos" type="number" inputmode="decimal" step="0.1"></div>
-        <div class="field"><label for="ca">Ca, total <span class="u">mg/dL</span></label><input id="ca" type="number" inputmode="decimal" step="0.1"></div>
-        <div class="field"><label for="alb">Albumin <span class="u">g/dL</span></label><input id="alb" type="number" inputmode="decimal" step="0.1"></div>
-        <div class="field"><label for="ica">Ionized Ca <span class="u">mmol/L</span></label><input id="ica" type="number" inputmode="decimal" step="0.01"></div>
+        <div class="field"><label for="k">K <span class="u">mEq/L · normal 3.5–5.0</span></label><input id="k" type="number" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="mg">Mg <span class="u">mg/dL · normal 1.6–2.6</span></label><input id="mg" type="number" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="phos">Phos <span class="u">mg/dL · normal 2.6–4.9</span></label><input id="phos" type="number" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="ca">Ca, total <span class="u">mg/dL · normal 8.7–10.4</span></label><input id="ca" type="number" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="alb">Albumin <span class="u">g/dL · normal 3.2–4.8</span></label><input id="alb" type="number" inputmode="decimal" step="0.1"></div>
+        <div class="field"><label for="ica">Ionized Ca <span class="u">mmol/L · normal 1.16–1.31</span></label><input id="ica" type="number" inputmode="decimal" step="0.01"></div>
       </div>
       <div class="out" id="outLabPrev"></div>
       <p class="editbar" id="editBar" hidden></p>
@@ -394,8 +436,12 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
       <div id="labNext"></div>
       <p class="note">Typed values count right away. Logging saves them to the trend and resets the start times for any electrolyte in this draw. Entered a wrong value? Tap Edit on that row in the Lab trend.</p>
     </section>
+    <details class="box" id="chartBox" open>
+      <summary>Trends <small class="sub">logged draws · tap a dot for its value</small></summary>
+      <div class="boxbody charts" id="charts"></div>
+    </details>
     <section class="panel" aria-labelledby="h-lablog">
-      <h2 id="h-lablog">Lab trend <small>newest first</small></h2>
+      <h2 id="h-lablog">Lab trend <small>newest first · L/H = outside the normal range · red = in a replacement row</small></h2>
       <div class="tablewrap"><table class="log" id="labLog">
         <thead><tr><th><span class="sr">Edit</span></th><th>Drawn</th><th>K</th><th>Mg</th><th>Phos</th><th>Ca</th><th>Alb</th><th>Corr. Ca</th><th>iCa</th></tr></thead>
         <tbody></tbody>
@@ -420,6 +466,24 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     <details class="box" open>
       <summary>The protocol <small class="sub">your rows highlighted</small></summary>
       <div class="boxbody" id="refTables"></div>
+    </details>
+    <details class="box">
+      <summary>Lab reference ranges <small class="sub">Reston lab</small></summary>
+      <div class="boxbody">
+        <table class="rates"><thead><tr><th>Lab</th><th>Normal</th><th>Protocol replaces at</th></tr></thead><tbody>
+          <tr><td>K</td><td>3.5–5.0 mEq/L</td><td>4.0 or less</td></tr>
+          <tr><td>Mg</td><td>1.6–2.6 mg/dL</td><td>1.8 or less</td></tr>
+          <tr><td>Phos</td><td>2.6–4.9 mg/dL</td><td>2.5 or less (PO), 3.0 or less (IV)</td></tr>
+          <tr><td>Ca, total</td><td>8.7–10.4 mg/dL</td><td>Corrected 8.5 or less</td></tr>
+          <tr><td>Albumin</td><td>3.2–4.8 g/dL</td><td>Used to correct Ca</td></tr>
+          <tr><td>Ionized Ca</td><td>1.16–1.31 mmol/L</td><td>1.12 or less</td></tr>
+        </tbody></table>
+        <ul>
+          <li><b>Replaced while still normal:</b> K 3.5–4.0, Mg 1.6–1.8, and Phos 2.6–3.0 on IV. The protocol keeps these at the high end.</li>
+          <li><b>Low, but no protocol row:</b> corrected Ca 8.6 and ionized Ca 1.13–1.15. The app says so; ask the provider if it matters.</li>
+          <li>These are Reston's lab ranges as of November 2026. If a result in Expanse shows a different range, that range wins. Corrected Ca is compared with the total Ca range.</li>
+        </ul>
+      </div>
     </details>
     <details class="box">
       <summary>Where the sheet is unclear</summary>
@@ -506,12 +570,13 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
       <p class="note">Last reviewed November 17, 2026.</p>
       <ol>
         <li>Reston Hospital Center. ICU Electrolyte Replacement (non-cardiac ICU). 3 pages, undated.<span class="use">Every range, dose, route and recheck time</span></li>
+        <li>Reston Hospital Center laboratory. Reference ranges (normal) for K, Mg, Phos, Ca, albumin and ionized Ca, as of November 17, 2026.<span class="use">The normal ranges, L/H flags and green chart lines</span></li>
         <li>Payne RB, Little AJ, Williams RB, Milner JR. Interpretation of serum calcium in patients with abnormal serum proteins. <i>Br Med J</i>. 1973;4(5893):643-646. <a href="https://doi.org/10.1136/bmj.4.5893.643" target="_blank" rel="noopener">doi:10.1136/bmj.4.5893.643</a><span class="use">Corrected calcium: + 0.8 mg/dL for each 1 g/dL of albumin below 4</span></li>
         <li>Huang CL, Kuo E. Mechanism of hypokalemia in magnesium deficiency. <i>J Am Soc Nephrol</i>. 2007;18(10):2649-2652. <a href="https://doi.org/10.1681/ASN.2007070792" target="_blank" rel="noopener">doi:10.1681/ASN.2007070792</a><span class="use">Low Mg makes low K hard to correct</span></li>
         <li>Sodium Phosphates Injection, USP [prescribing information]. Hospira (Pfizer).<span class="use">3 mmol phosphorus and 4 mEq sodium per mL; IV phosphate can lower serum calcium</span></li>
       </ol>
     </section>
-    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.8. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
+    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.11. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
   </div>
   </div>
 </div>
@@ -543,6 +608,11 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   var NAME = { k: "Potassium", mg: "Magnesium", phos: "Phosphorus", ca: "Calcium" };
   var SHORT = { k: "K", mg: "Mg", phos: "Phos", ca: "Ca" };
   var UNIT = { k: "mEq/L", mg: "mg/dL", phos: "mg/dL", ca: "mg/dL" };
+  // Reston Hospital Center lab reference ranges (normal), as of November 17, 2026. Corrected Ca uses the total Ca range.
+  var NORM = { k: [3.5, 5.0, 1], mg: [1.6, 2.6, 1], phos: [2.6, 4.9, 1], ca: [8.7, 10.4, 1], cca: [8.7, 10.4, 1], alb: [3.2, 4.8, 1], ica: [1.16, 1.31, 2] };
+  function nrng(key) { var n = NORM[key]; return n[0].toFixed(n[2]) + "–" + n[1].toFixed(n[2]); }
+  function nstat(key, v) { var n = NORM[key]; if (v == null) return ""; v = Math.round(v * Math.pow(10, n[2])) / Math.pow(10, n[2]); return v < n[0] - 1e-9 ? "Low" : v > n[1] + 1e-9 ? "High" : "Normal"; }
+  function nflag(key, v) { var st = nstat(key, v); return st === "Low" ? ' <small class="fl">L</small>' : st === "High" ? ' <small class="fl">H</small>' : ""; }
   var LABEL = { ok: "OK", watch: "Watch", tell: "Call provider", do: "Protocol", info: "Info" };
 
   // ---- The protocol: ICU Electrolyte Replacement (non-cardiac ICU), Reston Hospital Center.
@@ -825,6 +895,17 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   }
 
   // ---- Give tab: one panel per electrolyte
+  function lowDone(o) { var ly = o.ly; if (ly !== "ca") return nstat(ly, o.v) === "Low"; var useI = o.ti !== null && (state.give.ca.use === "ion" || o.tc === null); return nstat(useI ? "ica" : "cca", useI ? o.ic.v : o.corr) === "Low"; }
+  function normLine(o) {   // the lab's normal range next to where the protocol replaces
+    var ly = o.ly, bits = [];
+    if (ly === "ca") {
+      if (o.corr !== null) bits.push("Corrected " + f1(o.corr) + ": <b>" + nstat("cca", o.corr) + "</b> (normal " + nrng("ca") + ")");
+      if (o.ti !== null) bits.push("Ionized " + rd(o.ic.v, 2) + ": <b>" + nstat("ica", o.ic.v) + "</b> (normal " + nrng("ica") + ")");
+    } else {
+      var st = nstat(ly, o.v); bits.push("<b>" + st + "</b> (normal " + nrng(ly) + ")" + (st === "Normal" && !o.done ? ". The protocol still replaces at this value." : ""));
+    }
+    return '<p class="nrm">' + bits.join(" · ") + "</p>";
+  }
   function panelHTML(o) {
     var ly = o.ly, g = state.give[ly], R = run(ly) || {}, RL = RLAB[state.route] || "", h = [];
     var vShow = o.v === null ? "—" : ly === "ca" ? esc(o.vTxt) : o.vTxt + " <small>" + UNIT[ly] + "</small>";
@@ -833,6 +914,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
       h.push('<div class="out">' + card("info", NAME[ly], "—", ly === "ca" && o.needAlb ? "Total Ca needs albumin to correct (the sheet uses corrected Ca), or enter ionized Ca." : "Enter it on the Labs tab.") + "</div>");
       return h.join("");
     }
+    h.push(normLine(o));
     if (ly === "ca") {
       var parts = [];
       if (o.corr !== null) parts.push("Corrected " + f1(o.corr) + " = " + f1(o.ca.v) + " + 0.8 × (4 − " + f1(o.alb.v) + ")" + (o.tc === 0 ? ": over 8.5, no row" : o.tc === "gap" ? ": 7.0 has no row" : ": row " + CA_TIERS[o.tc - 1].c.replace("Corrected ", "")));
@@ -840,7 +922,8 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
       h.push('<p class="note">' + esc(parts.join(" · ")) + "</p>");
       if (o.mismatch) h.push('<p class="optlbl">They point to different rows. Which does the order use?</p><span class="seg" role="group" aria-label="Calcium value to use"><button type="button" data-use="ion" aria-pressed="' + (g.use === "ion") + '">Ionized</button><button type="button" data-use="cor" aria-pressed="' + (g.use === "cor") + '">Corrected</button></span>');
     }
-    if (o.done) { h.push('<div class="out">' + card("ok", "No replacement", "", "Above every row on the sheet. Recheck " + (ly === "k" ? "per routine labs (sheet: 3 and above, next AM)." : "per routine labs.")) + "</div>"); return h.join(""); }
+    if (o.done) { h.push('<div class="out">' + card(lowDone(o) ? "info" : "ok", "No replacement", "", (function () { var key = ly === "ca" ? (o.ti !== null && (state.give.ca.use === "ion" || o.tc === null) ? "ica" : "cca") : ly, st = nstat(key, ly === "ca" && key === "ica" ? o.ic.v : ly === "ca" ? o.corr : o.v);
+      return st === "Low" ? "Below the normal range (" + nrng(key === "cca" ? "ca" : key) + "), but above the sheet's top row, so this protocol gives nothing. Ask the provider if it matters for this patient. " : st === "High" ? "Above the normal range (" + nrng(key === "cca" ? "ca" : key) + "). " : "Above every row on the sheet. "; })() + "Recheck " + (ly === "k" ? "per routine labs (sheet: 3 and above, next AM)." : "per routine labs.")) + "</div>"); return h.join(""); }
     if (ly === "ca" && o.needUse) return h.join("");
     if (o.tier === "gap") { h.push('<div class="out">' + card("watch", "No row on the sheet", "7.0", "Corrected 7.0 falls between 7.1–7.8 and under 7. Ask the provider which dose to give.") + "</div>"); return h.join(""); }
     if (!state.route) { h.push('<div class="out">' + card("info", "Pick the route", "", "Choose PO, Peripheral or Central at the top of this tab.") + "</div>"); return h.join(""); }
@@ -935,6 +1018,9 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (I.phos.v !== null && I.phos.v < 1.0) stl.push("<dt>Phos " + I.phos.vTxt + "</dt><dd>Call MD (under 1).</dd>");
     else if (I.phos.v !== null && I.phos.v < 1.5 && I.phos.chosen && I.phos.chosen.rt.id === "po") stl.push("<dt>Phos " + I.phos.vTxt + "</dt><dd>Oral: Call MD and give 2 packets every 6 hours × 4.</dd>");
     $("stopList").innerHTML = stl.join(""); $("stopBox").hidden = !stl.length;
+    [["k", "K"], ["mg", "Mg"], ["phos", "Phos"]].forEach(function (x) { var o = I[x[0]]; if (o.v !== null && nstat(x[0], o.v) === "High") push("watch", x[1] + " " + o.vTxt + " is above normal (" + nrng(x[0]) + "). No replacement", "give"); });
+    if (I.ca.corr !== null && nstat("cca", I.ca.corr) === "High") push("watch", "Corrected Ca " + f1(I.ca.corr) + " is above normal (" + nrng("ca") + ")", "give");
+    if (I.ca.ic && I.ca.ic.v <= 2 && nstat("ica", I.ca.ic.v) === "High") push("watch", "Ionized Ca " + rd(I.ca.ic.v, 2) + " is above normal (" + nrng("ica") + ")", "give");
     if (I.k.v !== null && I.k.v <= 2.5) push("tell", "K " + I.k.vTxt + ": Call MD", "give");
     if (I.mg.v !== null && I.mg.v <= 0.5) push("tell", "Mg " + I.mg.vTxt + ": Call MD", "give");
     if (I.phos.v !== null && I.phos.v < 1.0) push("tell", "Phos " + I.phos.vTxt + ": Call MD", "give");
@@ -981,7 +1067,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var need = LY.filter(function (ly) { var o = I[ly]; return o.v !== null && !o.done; });
     $("labNext").innerHTML = editRow ? "" : state.labs.length || LABKEYS.some(function (k) { return num(k) !== null; }) ?
       (need.length ? '<button type="button" class="btn" data-go="give">Next: replace ' + esc(need.map(function (l) { return SHORT[l]; }).join(", ")) + " on Give →</button>" : '<p class="note"><b>Nothing to replace from these values.</b></p>') : "";
-    renderLabLog();
+    renderLabLog(); renderCharts();
     $("refTables").innerHTML = refHTML(I);
 
     // Prompts + tab counts
@@ -1008,14 +1094,84 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var rows = state.labs.map(function (r) {
       var f = function (v) { return v == null ? "" : r1s(v); }, c = corrOf(r.ca, r.alb);
       var lo = function (key, v) { return v == null ? "" : (key === "k" && v <= 4.0) || (key === "mg" && v <= 1.8) || (key === "phos" && v <= 2.5) ? " lo" : ""; };
-      return '<tr><td class="ed"><button type="button" class="editbtn" data-edit="' + state.labs.indexOf(r) + '" aria-label="Edit the ' + esc(mdhm(r.ts)) + ' draw">Edit</button></td><td class="n">' + esc(mdhm(r.ts)) + '</td><td class="n' + lo("k", r.k) + '">' + f(r.k) + '</td><td class="n' + lo("mg", r.mg) + '">' + f(r.mg) + '</td><td class="n' + lo("phos", r.phos) + '">' + f(r.phos) +
-        '</td><td class="n">' + f(r.ca) + '</td><td class="n">' + f(r.alb) + '</td><td class="n' + (c !== null && c <= 8.5 ? " lo" : "") + '">' + (c === null ? "" : f1(c)) + '</td><td class="n' + (r.ica != null && r.ica <= 1.12 ? " lo" : "") + '">' + (r.ica == null ? "" : r.ica) + "</td></tr>";
+      var fv = function (key, v) { return v == null ? "" : f(v) + nflag(key, v); };
+      return '<tr><td class="ed"><button type="button" class="editbtn" data-edit="' + state.labs.indexOf(r) + '" aria-label="Edit the ' + esc(mdhm(r.ts)) + ' draw">Edit</button></td><td class="n">' + esc(mdhm(r.ts)) + '</td><td class="n' + lo("k", r.k) + '">' + fv("k", r.k) + '</td><td class="n' + lo("mg", r.mg) + '">' + fv("mg", r.mg) + '</td><td class="n' + lo("phos", r.phos) + '">' + fv("phos", r.phos) +
+        '</td><td class="n">' + fv("ca", r.ca) + '</td><td class="n">' + fv("alb", r.alb) + '</td><td class="n' + (c !== null && c <= 8.5 ? " lo" : "") + '">' + (c === null ? "" : f1(c) + nflag("cca", c)) + '</td><td class="n' + (r.ica != null && r.ica <= 1.12 ? " lo" : "") + '">' + (r.ica == null ? "" : r.ica + nflag("ica", r.ica)) + "</td></tr>";
     });
     rows = rows.map(function (h, i) { return state.labs[i] === editRow ? h.replace("<tr>", '<tr class="editing">') : h; });
-    tb.innerHTML = rows.length ? rows.join("") : '<tr><td class="empty" colspan="9">No labs logged yet. Red = in a replacement row.</td></tr>';
+    tb.innerHTML = rows.length ? rows.join("") : '<tr><td class="empty" colspan="9">No labs logged yet.</td></tr>';
     $("undoLabBtn").disabled = !state.labs.length;
   }
   function r1s(v) { return String(rd(v, 2)); }
+
+  // ---- Trend charts (small multiples: one scale per electrolyte, never a shared axis)
+  var CHARTS = [
+    { key: "k", name: "Potassium", unit: "mEq/L", dec: 1, lo: 2.0, hi: 6.0, step: 1, zone: 4.0, zoneTxt: "Replace: 4.0 or less", call: 2.5, callTxt: "Call MD: 2.5 or less" },
+    { key: "mg", name: "Magnesium", unit: "mg/dL", dec: 1, lo: 0.0, hi: 3.0, step: 0.5, zone: 1.8, zoneTxt: "Replace: 1.8 or less", call: 0.5, callTxt: "Call MD: 0.5 or less" },
+    { key: "phos", name: "Phosphorus", unit: "mg/dL", dec: 1, lo: 0.0, hi: 5.0, step: 1, zone: 2.5, zoneTxt: "Replace PO and IV: 2.5 or less", zone2: 3.0, zone2Txt: "IV only: 2.6–3.0", call: 1.0, callTxt: "Call MD: under 1" },
+    { key: "cca", name: "Corrected Ca", unit: "mg/dL", dec: 1, lo: 6.0, hi: 11.0, step: 1, zone: 8.5, zoneTxt: "Replace: 8.5 or less" },
+    { key: "ica", name: "Ionized Ca", unit: "mmol/L", dec: 2, lo: 0.8, hi: 1.4, step: 0.2, zone: 1.12, zoneTxt: "Replace: 1.12 or less" }
+  ];
+  function seriesOf(key) {
+    var rows = state.labs.slice().sort(function (a, b) { return a.ts - b.ts; }), out = [];
+    rows.forEach(function (r, i) {
+      if (key === "cca") {
+        if (r.ca == null) return;
+        var alb = null; for (var j = i; j >= 0; j--) { if (rows[j].alb != null) { alb = rows[j].alb; break; } }
+        if (alb !== null) out.push({ ts: r.ts, v: corrOf(r.ca, alb) });
+      } else if (r[key] != null) out.push({ ts: r.ts, v: r[key] });
+    });
+    return out;
+  }
+  var chartSel = {};
+  function chartSVG(c, pts) {
+    var W = 600, H = 200, L = 52, R = 18, T = 16, B = 34, iw = W - L - R, ih = H - T - B;
+    var vmin = Math.min.apply(null, pts.map(function (p) { return p.v; })), vmax = Math.max.apply(null, pts.map(function (p) { return p.v; }));
+    var lo = Math.min(c.lo, Math.floor((vmin - c.step / 2) / c.step) * c.step), hi = Math.max(c.hi, Math.ceil((vmax + c.step / 2) / c.step) * c.step);
+    var t0 = pts[0].ts, t1 = pts[pts.length - 1].ts, span = t1 - t0;
+    var X = function (ts) { return span ? L + (ts - t0) / span * iw : L + iw / 2; };
+    var Y = function (v) { return T + (hi - v) / (hi - lo) * ih; };
+    var g = [];
+    // replacement range (shaded) and Call MD line (dashed)
+    g.push('<rect class="zone" x="' + L + '" y="' + Y(c.zone) + '" width="' + iw + '" height="' + (Y(lo) - Y(c.zone)) + '"/>');
+    if (c.zone2) g.push('<defs><pattern id="hz-' + c.key + '" class="hz" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="9"/></pattern></defs>');
+    if (c.zone2) g.push('<rect class="zone2h" fill="url(#hz-' + c.key + ')" x="' + L + '" y="' + Y(c.zone2) + '" width="' + iw + '" height="' + (Y(c.zone) - Y(c.zone2)) + '"/>');
+    if (c.zone2) g.push('<rect class="zone2" x="' + L + '" y="' + Y(c.zone2) + '" width="' + iw + '" height="' + (Y(c.zone) - Y(c.zone2)) + '"/><line class="z2l" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(c.zone2) + '" y2="' + Y(c.zone2) + '"/>');
+    for (var v = Math.ceil(lo / c.step - 1e-9) * c.step; v <= hi + 1e-9; v += c.step) {
+      var y = Y(v); g.push('<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '"/><text class="axn" x="' + (L - 8) + '" y="' + (y + 6) + '" text-anchor="end">' + rd(v, c.dec).toFixed(c.dec) + "</text>");
+    }
+    var nr = NORM[c.key]; if (nr) [nr[0], nr[1]].forEach(function (v) { g.push('<line class="nl" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/>'); });
+    if (c.call) g.push('<line class="call" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(c.call) + '" y2="' + Y(c.call) + '"/>');
+    // x labels: first and last draw
+    g.push('<text class="ax" x="' + L + '" y="' + (H - 6) + '">' + mdhm(t0) + "</text>");
+    if (span) g.push('<text class="ax" x="' + (W - R) + '" y="' + (H - 6) + '" text-anchor="end">' + mdhm(t1) + "</text>");
+    if (pts.length > 1) g.push('<polyline class="ln" points="' + pts.map(function (p) { return X(p.ts).toFixed(1) + "," + Y(p.v).toFixed(1); }).join(" ") + '"/>');
+    var sel = chartSel[c.key] != null && chartSel[c.key] < pts.length ? chartSel[c.key] : pts.length - 1;
+    pts.forEach(function (p, i) {
+      var x = X(p.ts), y = Y(p.v), lbl = mdhm(p.ts) + ": " + rd(p.v, c.dec).toFixed(c.dec) + " " + c.unit;
+      g.push('<circle class="hit" r="22" cx="' + x + '" cy="' + y + '" data-ch="' + c.key + '" data-i="' + i + '" tabindex="0" role="button" aria-label="' + esc(lbl) + '"><title>' + esc(lbl) + "</title></circle>");
+      g.push('<circle class="pt' + (i === sel ? " sel" : "") + '" r="' + (i === sel ? 8 : 6.5) + '" cx="' + x + '" cy="' + y + '"/>');
+    });
+    // direct labels: only the first and the selected/newest point
+    var lab = function (i) { var p = pts[i], x = X(p.ts), y = Y(p.v), up = y - T > 30; var a = x > W - R - 40 ? "end" : x < L + 40 ? "start" : "middle";
+      return '<text class="vl" x="' + x + '" y="' + (up ? y - 14 : y + 30) + '" text-anchor="' + a + '">' + rd(p.v, c.dec).toFixed(c.dec) + "</text>"; };
+    if (pts.length > 1 && sel !== 0) g.push(lab(0));
+    g.push(lab(sel));
+    var desc = c.name + " trend, " + pts.length + " draws, " + rd(pts[0].v, c.dec).toFixed(c.dec) + " on " + mdhm(t0) + " to " + rd(pts[pts.length - 1].v, c.dec).toFixed(c.dec) + " on " + mdhm(t1) + " " + c.unit;
+    return '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(desc) + '">' + g.join("") + "</svg>";
+  }
+  function renderCharts() {
+    var html = CHARTS.map(function (c) {
+      var pts = seriesOf(c.key); if (!pts.length) return "";
+      var last = pts[pts.length - 1], prev = pts[pts.length - 2], d = prev ? rd(last.v - prev.v, c.dec) : null;
+      var chg = d === null ? "" : d > 0 ? "↑ " + Math.abs(d).toFixed(c.dec) + " since last" : d < 0 ? "↓ " + Math.abs(d).toFixed(c.dec) + " since last" : "no change";
+      var sel = chartSel[c.key] != null && chartSel[c.key] < pts.length ? pts[chartSel[c.key]] : null;
+      return '<div class="ch"><div class="hd"><b>' + c.name + "</b><span>" + rd(last.v, c.dec).toFixed(c.dec) + " <small>" + c.unit + (chg ? " · " + chg : "") + "</small></span></div>" + chartSVG(c, pts) +
+        '<div class="key"><span><i class="sw z"></i>' + esc(c.zoneTxt) + "</span>" + (c.zone2 ? '<span><i class="sw z2"></i>' + esc(c.zone2Txt) + "</span>" : "") + (c.call ? '<span><i class="sw c"></i>' + esc(c.callTxt) + "</span>" : "") + '<span><i class="sw n"></i>Normal ' + nrng(c.key) + "</span></div>" +
+        '<p class="cap">' + (pts.length < 3 ? "Log 3 or more draws to see a trend. " : "") + (sel ? "<b>" + mdhm(sel.ts) + ": " + rd(sel.v, c.dec).toFixed(c.dec) + "</b> " + c.unit : "Tap a dot for its value.") + "</p></div>";
+    }).join("");
+    $("charts").innerHTML = html || '<p class="note">Log labs to see trends here.</p>';
+  }
   // ---- Editing a logged draw: the form loads it, Log labs becomes Save changes
   var editRow = null, delArm = 0;
   var GROUP = { k: ["k"], mg: ["mg"], phos: ["phos"], ca: ["ca", "alb", "ica"] };
@@ -1071,6 +1227,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     LABKEYS.forEach(function (k) { var v = num(k); row[k] = v; if (v !== null) any = true; });
     if (!any) { $("k").focus(); return; }
     state.labs.push(row); state.labs.sort(function (a, b) { return b.ts - a.ts; }); store("lyte-labs", state.labs);
+    chartSel = {};
     // A new value restarts that electrolyte's plan (route kept)
     var map = { k: ["k"], mg: ["mg"], phos: ["phos"], ca: ["ca", "alb", "ica"] };
     LY.forEach(function (ly) { if (map[ly].some(function (k) { return row[k] !== null; })) { state.give[ly] = BLANK(); } });
@@ -1091,7 +1248,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var corr = I.ca.corr;
     var head = '<div class="phd"><h1>Lyte Check · Electrolyte replacement</h1><div class="wr">Date ' + wi(lab.ts ? mdy(lab.ts) : mdy(labTs())) + " &nbsp; Room " + wi("", "s") + "</div></div>" +
       '<div class="line"><span>Order active in Expanse: Y · N</span><span>Route: ' + circ([["po", "PO"], ["piv", "Peripheral (PIV, midline)"], ["cvc", "Central (CVC, PICC, port)"]], state.route) + '</span><span>Order limits checked (renal, UO): Y · N</span><span>Can take PO: Y · N</span></div>' +
-      '<table class="lab"><thead><tr><th>Drawn</th><th>K</th><th>Mg</th><th>Phos</th><th>Ca</th><th>Albumin</th><th>Corrected Ca</th><th>Ionized Ca</th></tr></thead><tbody><tr><td>' +
+      '<table class="lab"><thead><tr><th>Drawn</th><th>K<br><small>3.5–5.0</small></th><th>Mg<br><small>1.6–2.6</small></th><th>Phos<br><small>2.6–4.9</small></th><th>Ca<br><small>8.7–10.4</small></th><th>Albumin<br><small>3.2–4.8</small></th><th>Corrected Ca<br><small>8.7–10.4</small></th><th>Ionized Ca<br><small>1.16–1.31</small></th></tr></thead><tbody><tr><td>' +
         (lab.ts ? mdhm(lab.ts) : "") + "</td><td>" + val("k") + "</td><td>" + val("mg") + "</td><td>" + val("phos") + "</td><td>" + (I.ca.ca ? I.ca.ca.v : "") + "</td><td>" + val("alb") + "</td><td>" + (corr === null ? "" : f1(corr)) + "</td><td>" + (I.ca.ic ? I.ca.ic.v : "") + "</td></tr></tbody></table>";
     var MAXD = { k: 8, mg: 6, phos: 4, ca: 4 };
     var blocks = LY.map(function (ly) {
@@ -1110,7 +1267,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
         "<span>MD called: Y · N</span></div>" +
         '<table class="dzt"><thead><tr><th style="width:0.6in"></th>' + th + '</tr></thead><tbody><tr><td class="rl">Due</td>' + due + '</tr><tr><td class="rl">Given at</td>' + giv + "</tr></tbody></table></div>";
     }).join("");
-    var p1 = '<div class="pp">' + head + blocks + '<div class="notes"><h2>Notes</h2>' + new Array(3).join("<div></div>") + "</div>" + '<p class="pfoot">Prompts, not orders: the provider\'s orders and the protocol decide. No names or MRNs. © 2026 Hanniel G. Ortiz, CC BY-NC-ND 4.0; protocol by Reston Hospital Center. Not affiliated with or endorsed by Reston or HCA.</p></div>';
+    var p1 = '<div class="pp">' + head + blocks + '<div class="notes"><h2>Notes</h2>' + new Array(2).join("<div></div>") + "</div>" + '<p class="pfoot">Prompts, not orders: the provider\'s orders and the protocol decide. No names or MRNs. © 2026 Hanniel G. Ortiz, CC BY-NC-ND 4.0; protocol by Reston Hospital Center. Not affiliated with or endorsed by Reston or HCA.</p></div>';
     var refT = function (ly) {
       if (ly === "ca") return '<table class="ref"><thead><tr><th>Ca</th><th>PO (CaCO₃ 500 mg tabs)</th><th>IV (Ca gluconate 1 g)</th></tr></thead><tbody>' +
         CA_TIERS.map(function (t, i) { return "<tr><td>" + t.c + "<br>" + t.i + "</td><td>" + esc(PROT.ca[0].rows[i].sheet) + "</td><td>" + esc(PROT.ca[1].rows[i].sheet) + "</td></tr>"; }).join("") + "</tbody></table>";
@@ -1200,6 +1357,11 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   $("logLabBtn").addEventListener("click", logLabs);
   $("cancelEditBtn").addEventListener("click", endEdit);
   $("delLabBtn").addEventListener("click", deleteEdit);
+  function pickPoint(t) { chartSel[t.getAttribute("data-ch")] = +t.getAttribute("data-i"); renderCharts(); }
+  $("charts").addEventListener("click", function (ev) { var t = ev.target.closest ? ev.target.closest("[data-ch]") : null; if (t) pickPoint(t); });
+  $("charts").addEventListener("keydown", function (ev) { var t = ev.target; if ((ev.key === "Enter" || ev.key === " ") && t.getAttribute && t.getAttribute("data-ch")) { ev.preventDefault(); pickPoint(t); } });
+  $("chartBox").open = load("lyte-charts", true) !== false;
+  $("chartBox").addEventListener("toggle", function () { store("lyte-charts", $("chartBox").open); });
   $("labLog").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("[data-edit]") : null; if (b) startEdit(+b.getAttribute("data-edit")); });
   $("undoLabBtn").addEventListener("click", undoLabs);
   IDS.forEach(function (id) { $(id).addEventListener("input", function () { $("exampleNote").hidden = true; compute(); }); });
@@ -1284,7 +1446,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (!("serviceWorker" in navigator)) { say("Offline use isn't available in this browser."); return; }
     say("Saving for offline use…");
     navigator.serviceWorker.register("sw.js").then(function () { return navigator.serviceWorker.ready; })
-      .then(function () { return caches.has("lyte-check-2026-11-17.8"); })
+      .then(function () { return caches.has("lyte-check-2026-11-17.11"); })
       .then(function (ok) { say(ok ? "Ready offline ✓" : "Saving for offline use… reopen the app in a few seconds."); })
       .catch(function () { say("Couldn't save for offline use. Open the app once more while online."); });
   })();
