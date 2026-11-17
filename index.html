@@ -227,12 +227,19 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 .btn:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
 
 .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 10px; }
-table.log { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+table.log { border-collapse: collapse; width: 100%; min-width: 580px; font-size: 13.5px; font-variant-numeric: tabular-nums; }
 table.log th { background: var(--panel2); font-size: 11.5px; font-weight: 700; text-align: left; padding: 6px 8px; line-height: 1.2; vertical-align: bottom; color: var(--muted); }
 table.log td { border-top: 1px solid var(--line); padding: 6px 8px; vertical-align: top; }
 table.log td.n { font-family: var(--font-num); font-weight: 600; white-space: nowrap; }
 table.log td.lo { color: var(--tell); }
 table.log td.empty { color: var(--muted); font-family: var(--font-body); }
+table.log td.ed { padding: 3px 4px 3px 6px; width: 1%; }
+table.log tr.editing td { background: var(--watch-bg); }
+.editbtn { background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; min-height: 34px; font: 700 13px var(--font-body); cursor: pointer; }
+.editbtn:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.editbar { margin: 0; font-size: 14px; background: var(--watch-bg); border-left: 4px solid var(--watch); border-radius: 8px; padding: 7px 10px; }
+.btn.del { color: var(--tell); border-color: var(--tell); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 details.box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 14px; min-width: 0; }
 details.box summary { cursor: pointer; padding: 13px 0; font-family: var(--font-display); font-weight: 700; font-size: 16.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); }
@@ -381,14 +388,16 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
         <div class="field"><label for="ica">Ionized Ca <span class="u">mmol/L</span></label><input id="ica" type="number" inputmode="decimal" step="0.01"></div>
       </div>
       <div class="out" id="outLabPrev"></div>
-      <div class="btnrow"><button type="button" class="btn" id="logLabBtn">Log labs</button><button type="button" class="btn ghost small" id="undoLabBtn">Undo last labs</button></div>
+      <p class="editbar" id="editBar" hidden></p>
+      <div class="btnrow"><button type="button" class="btn" id="logLabBtn">Log labs</button><button type="button" class="btn ghost small" id="undoLabBtn">Undo last labs</button>
+        <button type="button" class="btn ghost small" id="cancelEditBtn" hidden>Cancel</button><button type="button" class="btn ghost small del" id="delLabBtn" hidden>Delete this draw</button></div>
       <div id="labNext"></div>
-      <p class="note">Typed values count right away. Logging saves them to the trend and resets the start times for any electrolyte in this draw.</p>
+      <p class="note">Typed values count right away. Logging saves them to the trend and resets the start times for any electrolyte in this draw. Entered a wrong value? Tap Edit on that row in the Lab trend.</p>
     </section>
     <section class="panel" aria-labelledby="h-lablog">
       <h2 id="h-lablog">Lab trend <small>newest first</small></h2>
       <div class="tablewrap"><table class="log" id="labLog">
-        <thead><tr><th>Drawn</th><th>K</th><th>Mg</th><th>Phos</th><th>Ca</th><th>Alb</th><th>Corr. Ca</th><th>iCa</th></tr></thead>
+        <thead><tr><th><span class="sr">Edit</span></th><th>Drawn</th><th>K</th><th>Mg</th><th>Phos</th><th>Ca</th><th>Alb</th><th>Corr. Ca</th><th>iCa</th></tr></thead>
         <tbody></tbody>
       </table></div>
     </section>
@@ -502,7 +511,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
         <li>Sodium Phosphates Injection, USP [prescribing information]. Hospira (Pfizer).<span class="use">3 mmol phosphorus and 4 mEq sodium per mL; IV phosphate can lower serum calcium</span></li>
       </ol>
     </section>
-    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.6. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
+    <p class="foot">The flags are prompts, not orders. The provider's orders and the unit's protocol decide what is given. Nothing is sent anywhere. Your numbers stay on this device so a closed app doesn't lose them; Clear wipes them. Version 2026-11-17.8. <span id="offlineState"></span><br>© 2026 Hanniel G. Ortiz. Original content licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a>; the protocol belongs to Reston Hospital Center. Not affiliated with or endorsed by Reston Hospital Center or HCA Healthcare. See <a href="#" data-open-terms>Disclaimer, terms and license</a>.</p>
   </div>
   </div>
 </div>
@@ -603,7 +612,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   };
 
   function rd(v, d) { var f = Math.pow(10, d); return Math.round(v * f + (v >= 0 ? 1e-7 : -1e-7)) / f; }
-  function f1(v) { return v === null || v === undefined ? "—" : String(rd(v, 1)); }
+  function f1(v) { return v === null || v === undefined ? "—" : rd(v, 1).toFixed(1); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function inRow(r, v) { return (r.lo === null || v >= r.lo - 1e-9) && v <= r.hi + 1e-9; }
   // Rows that hold v for one route: [] above the table, or a "gap" marker if v is under the top but in no row
@@ -654,7 +663,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
 
   function num(id) { var v = $(id).value.trim(); if (v === "") return null; var n = parseFloat(v); return isFinite(n) ? n : null; }
   function cur(key) {   // typed value first, then the newest logged one
-    var v = num(key); if (v !== null) return { v: v, ts: null, form: true };
+    var v = editRow ? null : num(key); if (v !== null) return { v: v, ts: null, form: true };
     for (var i = 0; i < state.labs.length; i++) { var r = state.labs[i]; if (r[key] !== null && r[key] !== undefined) return { v: r[key], ts: r.ts }; }
     return null;
   }
@@ -688,6 +697,14 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (!dv) { var t0 = hasT ? parseHHMM(tv, Date.now()) : null; return t0 === null ? Date.now() : t0; }
     var d = new Date(+dv[1], +dv[2] - 1, +dv[3]), n = new Date();
     if (hasT) d.setHours(+tv.slice(0, 2), +tv.slice(2), 0, 0); else d.setHours(n.getHours(), n.getMinutes(), 0, 0);
+    return d.getTime();
+  }
+  function parseAfter(str, ref) {   // HHMM at or after ref (a lab draw time or a start time); rolls to the next day if earlier
+    var v = String(str || "").replace(/\D/g, ""); if (v.length === 3) v = "0" + v;
+    if (v.length !== 4) return null;
+    var h = +v.slice(0, 2), m = +v.slice(2); if (h > 23 || m > 59) return null;
+    var d = new Date(ref); d.setHours(h, m, 0, 0);
+    if (d.getTime() < ref - 30 * MIN) d.setDate(d.getDate() + 1);
     return d.getTime();
   }
   function whenShort(ts) { var d = new Date(ts), t = new Date(); return d.toDateString() === t.toDateString() ? hhmm(ts) : String(d.getMonth() + 1).padStart(2, "0") + "/" + String(d.getDate()).padStart(2, "0") + " " + hhmm(ts); }
@@ -738,7 +755,10 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   function lyteInfo(ly) {
     var g = state.give[ly], o = { ly: ly, routes: [], flags: [], tasks: [] };
     if (ly === "ca") {
-      var ca = cur("ca"), alb = cur("alb"), ic = cur("ica");
+      var ca, ic, alb = cur("alb");
+      if (!editRow && (num("ca") !== null || num("ica") !== null)) { ca = num("ca") !== null ? { v: num("ca"), form: true } : null; ic = num("ica") !== null ? { v: num("ica"), form: true } : null; }
+      else { var cr = state.labs.filter(function (r) { return r.ca != null || r.ica != null; })[0];
+        ca = cr && cr.ca != null ? { v: cr.ca, ts: cr.ts } : null; ic = cr && cr.ica != null ? { v: cr.ica, ts: cr.ts } : null; }
       o.ca = ca; o.alb = alb; o.ic = ic; o.corr = ca && alb ? corrOf(ca.v, alb.v) : null;
       if (ic && ic.v > 2) o.flags.push({ level: "watch", text: "Ionized Ca " + ic.v + " looks like mg/dL; the protocol uses mmol/L (about 1.0–1.3)", tab: "labs" });
       var tc = o.corr !== null ? caTierC(o.corr) : null, ti = ic && ic.v <= 2 ? caTierI(rd(ic.v, 2)) : null;
@@ -788,13 +808,13 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (row.call && !row.give) return o;
     // Times
     o.mon = monitor(ly, ly === "ca" ? 9 : o.v, pick.rt.id);
-    var S = parseHHMM(R.start, Date.now());
+    var S = o.ts ? parseAfter(R.start, o.ts) : parseHHMM(R.start, Date.now());
     o.doses = [];
     for (var i = 0; i < row.n; i++) o.doses.push({ at: S === null ? null : S + i * row.q * H, given: !!R.given[i] });
     o.endOff = (row.n - 1) * row.q + row.iv;   // hours from start until the last dose is in
     if (S !== null) {
       o.start = S; o.end = S + o.endOff * H;
-      var lastOverride = R.last ? parseHHMM(R.last, Date.now()) : null;
+      var lastOverride = R.last ? parseAfter(R.last, S) : null;
       o.lastAt = lastOverride || o.end; o.override = !!lastOverride;
       if (o.mon.kind === "after") o.recheck = o.lastAt + o.mon.hrs * H;
       var nx = o.doses.filter(function (d) { return !d.given; })[0];
@@ -815,7 +835,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     }
     if (ly === "ca") {
       var parts = [];
-      if (o.corr !== null) parts.push("Corrected " + f1(o.corr) + " = " + o.ca.v + " + 0.8 × (4 − " + o.alb.v + ")" + (o.tc === 0 ? ": over 8.5, no row" : o.tc === "gap" ? ": 7.0 has no row" : ": row " + CA_TIERS[o.tc - 1].c.replace("Corrected ", "")));
+      if (o.corr !== null) parts.push("Corrected " + f1(o.corr) + " = " + f1(o.ca.v) + " + 0.8 × (4 − " + f1(o.alb.v) + ")" + (o.tc === 0 ? ": over 8.5, no row" : o.tc === "gap" ? ": 7.0 has no row" : ": row " + CA_TIERS[o.tc - 1].c.replace("Corrected ", "")));
       if (o.ti !== null) parts.push("Ionized " + rd(o.ic.v, 2) + (o.ti === 0 ? ": over 1.12, no row" : ": row " + CA_TIERS[o.ti - 1].i.replace("Ionized ", "")));
       h.push('<p class="note">' + esc(parts.join(" · ")) + "</p>");
       if (o.mismatch) h.push('<p class="optlbl">They point to different rows. Which does the order use?</p><span class="seg" role="group" aria-label="Calcium value to use"><button type="button" data-use="ion" aria-pressed="' + (g.use === "ion") + '">Ionized</button><button type="button" data-use="cor" aria-pressed="' + (g.use === "cor") + '">Corrected</button></span>');
@@ -959,7 +979,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (num("ica") !== null && num("ica") > 2) pv.push(card("watch", "Ionized Ca units", num("ica"), "This looks like mg/dL. The protocol's ionized Ca is in mmol/L (normal about 1.1–1.3)."));
     $("outLabPrev").innerHTML = pv.join("");
     var need = LY.filter(function (ly) { var o = I[ly]; return o.v !== null && !o.done; });
-    $("labNext").innerHTML = state.labs.length || LABKEYS.some(function (k) { return num(k) !== null; }) ?
+    $("labNext").innerHTML = editRow ? "" : state.labs.length || LABKEYS.some(function (k) { return num(k) !== null; }) ?
       (need.length ? '<button type="button" class="btn" data-go="give">Next: replace ' + esc(need.map(function (l) { return SHORT[l]; }).join(", ")) + " on Give →</button>" : '<p class="note"><b>Nothing to replace from these values.</b></p>') : "";
     renderLabLog();
     $("refTables").innerHTML = refHTML(I);
@@ -979,6 +999,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
       bt.setAttribute("aria-label", t + (n ? ", " + n + " open item" + (n > 1 ? "s" : "") : ""));
     });
     if (!$("exampleNote").hidden) return;
+    if (editRow) return;
     var f = {}; IDS.forEach(function (id) { f[id] = $(id).value; }); store("lyte-fields", f);
   }
 
@@ -987,14 +1008,64 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var rows = state.labs.map(function (r) {
       var f = function (v) { return v == null ? "" : r1s(v); }, c = corrOf(r.ca, r.alb);
       var lo = function (key, v) { return v == null ? "" : (key === "k" && v <= 4.0) || (key === "mg" && v <= 1.8) || (key === "phos" && v <= 2.5) ? " lo" : ""; };
-      return '<tr><td class="n">' + esc(mdhm(r.ts)) + '</td><td class="n' + lo("k", r.k) + '">' + f(r.k) + '</td><td class="n' + lo("mg", r.mg) + '">' + f(r.mg) + '</td><td class="n' + lo("phos", r.phos) + '">' + f(r.phos) +
+      return '<tr><td class="ed"><button type="button" class="editbtn" data-edit="' + state.labs.indexOf(r) + '" aria-label="Edit the ' + esc(mdhm(r.ts)) + ' draw">Edit</button></td><td class="n">' + esc(mdhm(r.ts)) + '</td><td class="n' + lo("k", r.k) + '">' + f(r.k) + '</td><td class="n' + lo("mg", r.mg) + '">' + f(r.mg) + '</td><td class="n' + lo("phos", r.phos) + '">' + f(r.phos) +
         '</td><td class="n">' + f(r.ca) + '</td><td class="n">' + f(r.alb) + '</td><td class="n' + (c !== null && c <= 8.5 ? " lo" : "") + '">' + (c === null ? "" : f1(c)) + '</td><td class="n' + (r.ica != null && r.ica <= 1.12 ? " lo" : "") + '">' + (r.ica == null ? "" : r.ica) + "</td></tr>";
     });
-    tb.innerHTML = rows.length ? rows.join("") : '<tr><td class="empty" colspan="8">No labs logged yet. Red = in a replacement row.</td></tr>';
+    rows = rows.map(function (h, i) { return state.labs[i] === editRow ? h.replace("<tr>", '<tr class="editing">') : h; });
+    tb.innerHTML = rows.length ? rows.join("") : '<tr><td class="empty" colspan="9">No labs logged yet. Red = in a replacement row.</td></tr>';
     $("undoLabBtn").disabled = !state.labs.length;
   }
   function r1s(v) { return String(rd(v, 2)); }
+  // ---- Editing a logged draw: the form loads it, Log labs becomes Save changes
+  var editRow = null, delArm = 0;
+  var GROUP = { k: ["k"], mg: ["mg"], phos: ["phos"], ca: ["ca", "alb", "ica"] };
+  function sourceOf(ly) {   // the logged draw each electrolyte's plan is built from
+    if (ly === "ca") { var c = state.labs.filter(function (r) { return r.ca != null || r.ica != null; })[0]; return c || null; }
+    return state.labs.filter(function (r) { return r[ly] != null; })[0] || null;
+  }
+  function editMode(on) {
+    $("logLabBtn").textContent = on ? "Save changes" : "Log labs";
+    $("undoLabBtn").hidden = on; $("cancelEditBtn").hidden = !on; $("delLabBtn").hidden = !on; $("delLabBtn").textContent = "Delete this draw"; delArm = 0;
+    $("editBar").hidden = !on;
+    if (on) $("editBar").innerHTML = "<b>Editing the " + esc(mdhm(editRow.ts)) + " draw.</b> Fix the values, then Save changes. Clearing a box removes that value.";
+  }
+  function startEdit(i) {
+    var r = state.labs[i]; if (!r) return;
+    editRow = r;
+    $("ld").value = ymd(r.ts); $("lt").value = hhmm(r.ts); ldTouched = true;
+    LABKEYS.forEach(function (k) { $(k).value = r[k] != null ? r[k] : ""; });
+    editMode(true); compute();
+    try { $("h-lab").scrollIntoView({ block: "start" }); } catch (e) {}
+  }
+  function endEdit() {
+    editRow = null; IDS.forEach(function (k) { $(k).value = ""; }); ldTouched = false; setToday(); editMode(false); compute();
+  }
+  function resetPlans(before) {   // a plan whose source draw or value changed starts over (route kept)
+    LY.forEach(function (ly) {
+      var after = sourceOf(ly), b = before[ly];
+      var same = after && b && after === b.row && GROUP[ly].every(function (k) { return after[k] === b.vals[k]; }) && after.ts === b.ts;
+      if (!same && (after || b)) state.give[ly] = BLANK();
+    });
+    saveGive();
+  }
+  function snapshot() { var o = {}; LY.forEach(function (ly) { var r = sourceOf(ly); o[ly] = r ? { row: r, ts: r.ts, vals: GROUP[ly].reduce(function (m, k) { m[k] = r[k]; return m; }, {}) } : null; }); return o; }
+  function saveEdit() {
+    var vals = {}, any = false;
+    LABKEYS.forEach(function (k) { var v = num(k); vals[k] = v; if (v !== null) any = true; });
+    if (!any) { $("k").focus(); return; }
+    var before = snapshot();
+    editRow.ts = labTs(); LABKEYS.forEach(function (k) { editRow[k] = vals[k]; });
+    state.labs.sort(function (a, b) { return b.ts - a.ts; }); store("lyte-labs", state.labs);
+    resetPlans(before); endEdit();
+  }
+  function deleteEdit() {
+    if (Date.now() - delArm > 4000) { delArm = Date.now(); $("delLabBtn").textContent = "Tap again to delete"; return; }
+    var before = snapshot();
+    state.labs.splice(state.labs.indexOf(editRow), 1); store("lyte-labs", state.labs);
+    resetPlans(before); endEdit();
+  }
   function logLabs() {
+    if (editRow) { saveEdit(); return; }
     var ts = labTs();
     var row = { ts: ts }, any = false;
     LABKEYS.forEach(function (k) { var v = num(k); row[k] = v; if (v !== null) any = true; });
@@ -1021,7 +1092,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     var head = '<div class="phd"><h1>Lyte Check · Electrolyte replacement</h1><div class="wr">Date ' + wi(lab.ts ? mdy(lab.ts) : mdy(labTs())) + " &nbsp; Room " + wi("", "s") + "</div></div>" +
       '<div class="line"><span>Order active in Expanse: Y · N</span><span>Route: ' + circ([["po", "PO"], ["piv", "Peripheral (PIV, midline)"], ["cvc", "Central (CVC, PICC, port)"]], state.route) + '</span><span>Order limits checked (renal, UO): Y · N</span><span>Can take PO: Y · N</span></div>' +
       '<table class="lab"><thead><tr><th>Drawn</th><th>K</th><th>Mg</th><th>Phos</th><th>Ca</th><th>Albumin</th><th>Corrected Ca</th><th>Ionized Ca</th></tr></thead><tbody><tr><td>' +
-        (lab.ts ? mdhm(lab.ts) : "") + "</td><td>" + val("k") + "</td><td>" + val("mg") + "</td><td>" + val("phos") + "</td><td>" + val("ca") + "</td><td>" + val("alb") + "</td><td>" + (corr === null ? "" : f1(corr)) + "</td><td>" + val("ica") + "</td></tr></tbody></table>";
+        (lab.ts ? mdhm(lab.ts) : "") + "</td><td>" + val("k") + "</td><td>" + val("mg") + "</td><td>" + val("phos") + "</td><td>" + (I.ca.ca ? I.ca.ca.v : "") + "</td><td>" + val("alb") + "</td><td>" + (corr === null ? "" : f1(corr)) + "</td><td>" + (I.ca.ic ? I.ca.ic.v : "") + "</td></tr></tbody></table>";
     var MAXD = { k: 8, mg: 6, phos: 4, ca: 4 };
     var blocks = LY.map(function (ly) {
       var o = I[ly], g = state.give[ly], R = run(ly) || {};
@@ -1127,6 +1198,9 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
   $("ctHigh").addEventListener("click", function () { setContrast("high"); });
 
   $("logLabBtn").addEventListener("click", logLabs);
+  $("cancelEditBtn").addEventListener("click", endEdit);
+  $("delLabBtn").addEventListener("click", deleteEdit);
+  $("labLog").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("[data-edit]") : null; if (b) startEdit(+b.getAttribute("data-edit")); });
   $("undoLabBtn").addEventListener("click", undoLabs);
   IDS.forEach(function (id) { $(id).addEventListener("input", function () { $("exampleNote").hidden = true; compute(); }); });
   $("ld").addEventListener("input", function () { ldTouched = $("ld").value !== ymd(Date.now()); if (!$("ld").value) { ldTouched = false; setToday(); } });
@@ -1134,7 +1208,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     IDS.forEach(function (id) { $(id).value = ""; });
     state.labs = []; store("lyte-labs", []); LY.forEach(function (l) { state.give[l] = BLANK(); }); saveGive(); state.route = ""; store("lyte-route", ""); state.chk = []; store("lyte-chk", []);
     try { localStorage.removeItem("lyte-fields"); } catch (e) {}
-    ldTouched = false; setToday();
+    ldTouched = false; setToday(); editRow = null; editMode(false);
     $("exampleNote").hidden = true; compute(); showTab("labs"); $("k").focus();
   });
 
@@ -1210,7 +1284,7 @@ body.previewing #printSheet .pp { width: 7.6in; box-sizing: content-box; margin:
     if (!("serviceWorker" in navigator)) { say("Offline use isn't available in this browser."); return; }
     say("Saving for offline use…");
     navigator.serviceWorker.register("sw.js").then(function () { return navigator.serviceWorker.ready; })
-      .then(function () { return caches.has("lyte-check-2026-11-17.6"); })
+      .then(function () { return caches.has("lyte-check-2026-11-17.8"); })
       .then(function (ok) { say(ok ? "Ready offline ✓" : "Saving for offline use… reopen the app in a few seconds."); })
       .catch(function () { say("Couldn't save for offline use. Open the app once more while online."); });
   })();

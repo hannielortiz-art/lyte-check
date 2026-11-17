@@ -1,5 +1,5 @@
 // Lyte Check offline cache. Change VERSION whenever any file changes, so phones fetch the update.
-const VERSION = "lyte-check-2026-11-17.6";
+const VERSION = "lyte-check-2026-11-17.8";
 const FILES = [
   "./",
   "index.html",
